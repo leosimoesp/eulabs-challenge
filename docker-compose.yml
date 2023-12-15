@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  db:
+    image: mysql:8.2.0
+    container_name: db
+    env_file:
+      - .env
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      - MYSQL_USER=${DATABASE_USER}
+      - MYSQL_ROOT_PASSWORD=${DATABASE_PASSWORD}
+      - MYSQL_DATABASE=${DATABASE_NAME}
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+    ports:
+      - ${DATABASE_PORT}:${DATABASE_PORT}
+
+volumes:
+  mysql:
