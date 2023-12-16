@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE product (
+CREATE TABLE products (
      id BIGINT NOT NULL AUTO_INCREMENT,
      title VARCHAR(100) NOT NULL,
      code VARCHAR(80) NOT NULL,
@@ -16,7 +16,7 @@ CREATE TABLE product (
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE IF EXISTS product;
+DROP TABLE IF EXISTS products;
 -- +goose StatementEnd
 
 
