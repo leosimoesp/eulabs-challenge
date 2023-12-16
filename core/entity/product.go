@@ -19,6 +19,9 @@ func (p Product) IsValid() error {
 	if isEmpty := isEmpty(p.Code); isEmpty {
 		return InvalidCodeErr
 	}
+	if isEmpty := isEmpty(p.Description); isEmpty {
+		return RequiredDescriptionErr
+	}
 	if strings.Contains(p.Code, " ") {
 		return InvalidCodeErr
 	}
@@ -32,6 +35,7 @@ func (p Product) IsValid() error {
 		return InvalidPriceErr
 	}
 	return nil
+
 }
 
 func isEmpty(value string) bool {
