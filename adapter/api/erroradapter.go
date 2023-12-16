@@ -27,6 +27,11 @@ func Mapping(input error) MappedError {
 			ResultErr: input,
 			Code:      http.StatusConflict,
 		}
+	case entity.ProductNotFoundErr:
+		return MappedError{
+			ResultErr: input,
+			Code:      http.StatusNotFound,
+		}
 	}
 	return MappedError{
 		ResultErr: input,
