@@ -18,16 +18,16 @@ type DBPool struct {
 }
 type DBConfig struct {
 	Host               string
-	Port               string
 	User               string
 	Password           string
 	DBName             string
+	Port               int
 	MaxConnections     int
 	MaxIdleConnections int
 }
 
 func NewDBPool(cfg DBConfig) DBPool {
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", cfg.User, cfg.Password,
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", cfg.User, cfg.Password,
 		cfg.Host, cfg.Port, cfg.DBName)
 
 	return DBPool{dsn: dsn, maxConnections: cfg.MaxConnections,
@@ -45,4 +45,8 @@ func (p *DBPool) GetDB() *sql.DB {
 		instance = db
 	})
 	return instance
+}
+
+func (p *DBPool) GetDSN() string {
+	return p.dsn
 }
