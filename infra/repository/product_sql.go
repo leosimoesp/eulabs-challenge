@@ -88,3 +88,19 @@ func (r ProductRepositorySQL) GetByCode(ctx context.Context,
 		ID:           id,
 	}, nil
 }
+
+func (r ProductRepositorySQL) DeleteByCode(ctx context.Context, code string) (bool, error) {
+	codeWithoutSpace := strings.ReplaceAll(code, " ", "")
+	codeLowerCase := strings.ToLower(codeWithoutSpace)
+
+	query := `DELETE FROM products WHERE LOWER(code) = ?`
+	result, e := r.db.ExecContext(ctx, query, codeLowerCase)
+
+	if affectedRows, err := result.RowsAffected(); err == nil {
+		if affectedRows > 0 {
+			return affectedRows > 0, nil
+		}
+		return false, entity.ProductNotFoundErr
+	}
+	return e == nil, e
+}
