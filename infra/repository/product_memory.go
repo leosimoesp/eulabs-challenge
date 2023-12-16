@@ -39,6 +39,10 @@ func (r ProductRepositoryInMemory) GetByCode(ctx context.Context, code string) (
 	}, nil
 }
 
+func (ProductRepositoryInMemory) DeleteByCode(ctx context.Context, code string) (bool, error) {
+	return true, nil
+}
+
 type ProductRepositoryInMemorySpy struct {
 	ExpectedError error
 	ExpectedData  repository.ProductRepositoryData
@@ -52,4 +56,9 @@ func (spyRepo ProductRepositoryInMemorySpy) Insert(ctx context.Context,
 func (spyRepo ProductRepositoryInMemorySpy) GetByCode(ctx context.Context,
 	code string) (repository.ProductRepositoryData, error) {
 	return spyRepo.ExpectedData, spyRepo.ExpectedError
+}
+
+func (spyRepo ProductRepositoryInMemorySpy) DeleteByCode(ctx context.Context,
+	code string) (bool, error) {
+	return spyRepo.ExpectedError == nil, spyRepo.ExpectedError
 }
