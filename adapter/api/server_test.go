@@ -120,3 +120,60 @@ func createProductEmptyCodeErr(t *testing.T) {
 	assert.Equal(t, "{\"message\":\"code is invalid\"}\n", rec.Body.String())
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 }
+
+func TestWebServer_handleProductGet(t *testing.T) {
+	t.Run("Should handle get product request with success", getProductSuccess)
+	t.Run("Should results error if product code does not exists", getProductNotFoundErr)
+}
+
+func getProductSuccess(t *testing.T) {
+	productInMemoryRepo := repository.NewProductRepositoryInMemory()
+	ws := NewWebServer("8080", productInMemoryRepo)
+
+	e := echo.New()
+	rec := httptest.NewRecorder()
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/", nil)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	echoCtx := e.NewContext(req, rec)
+	echoCtx.SetPath("products/:code")
+	echoCtx.SetParamNames("code")
+	echoCtx.SetParamValues("XSZ-000741")
+
+	grApi := e.Group("/api/v1")
+	grApi.GET("/products", ws.handleProductGet)
+
+	var productGetOutputDTO usecase.ProductGetOutputDTO
+	err := ws.handleProductGet(echoCtx)
+	assert.Nil(t, err)
+
+	err2 := json.Unmarshal(rec.Body.Bytes(), &productGetOutputDTO)
+	assert.Nil(t, err2)
+	assert.Equal(t, "XSZ-000741", productGetOutputDTO.Code)
+	assert.Equal(t, http.StatusOK, rec.Code)
+}
+
+func getProductNotFoundErr(t *testing.T) {
+	productInMemoryRepo := repository.ProductRepositoryInMemorySpy{
+		ExpectedError: entity.ProductNotFoundErr,
+	}
+	ws := NewWebServer("8080", productInMemoryRepo)
+
+	e := echo.New()
+	rec := httptest.NewRecorder()
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/", nil)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	echoCtx := e.NewContext(req, rec)
+	echoCtx.SetPath("products/:code")
+	echoCtx.SetParamNames("code")
+	echoCtx.SetParamValues("XSZ-000741")
+
+	grApi := e.Group("/api/v1")
+	grApi.GET("/products", ws.handleProductGet)
+	e.ServeHTTP(rec, req)
+
+	err := ws.handleProductGet(echoCtx)
+	assert.NotNil(t, err)
+	assert.Equal(t, http.StatusNotFound, rec.Code)
+}
