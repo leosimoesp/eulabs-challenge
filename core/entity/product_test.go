@@ -11,6 +11,7 @@ import (
 func TestProduct_IsValid(t *testing.T) {
 	t.Run("Should validate with success a product", productIsValid)
 	t.Run("Should results error if code is empty", productCodeEmpty)
+	t.Run("Should results error if code is empty", productDescriptionEmpty)
 	t.Run("Should results error if code is empty", productCodeWithSpace)
 	t.Run("Should results error if title is empty", productTitleEmpty)
 	t.Run("Should results error if reference is empty", productReferenceEmpty)
@@ -44,6 +45,16 @@ func productCodeEmpty(t *testing.T) {
 	reference := uuid.FromStringOrNil("6ba7b810-9dad-11d1-80b4-00c04fd430c8")
 	product.Reference = reference.String()
 	assert.EqualError(t, product.IsValid(), entity.InvalidCodeErr.Error())
+}
+
+func productDescriptionEmpty(t *testing.T) {
+	product := entity.NewProduct()
+	product.Title = "exacqVision® VMS"
+	product.Code = "0001-DEF-UDSE-14587"
+	product.PriceInCents = int64(10000)
+	reference := uuid.FromStringOrNil("6ba7b810-9dad-11d1-80b4-00c04fd430c8")
+	product.Reference = reference.String()
+	assert.EqualError(t, product.IsValid(), entity.RequiredDescriptionErr.Error())
 }
 
 func productCodeWithSpace(t *testing.T) {
