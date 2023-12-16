@@ -1,8 +1,15 @@
 package usecase
 
 import (
+	"context"
+	"time"
+
 	"github.com/lbsti/eulabs-challenge/core/entity"
 	"github.com/lbsti/eulabs-challenge/core/repository"
+)
+
+const (
+	ProductCreateTimeout = time.Second * 300
 )
 
 type ProductCreate struct {
@@ -10,17 +17,17 @@ type ProductCreate struct {
 }
 
 type ProductInputDTO struct {
-	Title        string
-	Description  string
-	Code         string
-	Reference    string
-	PriceInCents int64
+	Title        string `json:"title"`
+	Description  string `json:"description"`
+	Code         string `json:"code"`
+	Reference    string `json:"reference"`
+	PriceInCents int64  `json:"priceInCents"`
 }
 
 type ProductOutputDTO struct {
-	CreatedAt string
-	Reference string
-	ID        int64
+	CreatedAt string `json:"createdAt"`
+	Reference string `json:"reference"`
+	ID        int64  `json:"id"`
 }
 
 func NewProductCreate(productRepo repository.ProductRepository) *ProductCreate {
@@ -29,12 +36,15 @@ func NewProductCreate(productRepo repository.ProductRepository) *ProductCreate {
 	}
 }
 
-func (p *ProductCreate) Execute(input ProductInputDTO) (ProductOutputDTO, error) {
+func (p *ProductCreate) Execute(ctx context.Context, input ProductInputDTO) (ProductOutputDTO, error) {
 	if e := p.validate(input); e != nil {
 		return ProductOutputDTO{}, e
 	}
 
-	productData, err := p.repository.Insert(repository.ProductRepositoryInput{
+	ctxWithTimeout, cancel := context.WithTimeout(ctx, time.Duration(ProductCreateTimeout))
+	defer cancel()
+
+	productData, err := p.repository.Insert(ctxWithTimeout, repository.ProductRepositoryInput{
 		Title:        input.Title,
 		Description:  input.Description,
 		Code:         input.Code,

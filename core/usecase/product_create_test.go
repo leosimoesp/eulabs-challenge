@@ -1,25 +1,18 @@
 package usecase_test
 
 import (
+	"context"
 	"errors"
 	"testing"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/lbsti/eulabs-challenge/core/entity"
-	productrepo "github.com/lbsti/eulabs-challenge/core/repository"
+
 	"github.com/lbsti/eulabs-challenge/core/usecase"
+
 	"github.com/lbsti/eulabs-challenge/infra/repository"
 	"github.com/stretchr/testify/assert"
 )
-
-type ProductRepositoryInMemorySpy struct {
-	ExpectedError error
-	ExpectedData  productrepo.ProductRepositoryData
-}
-
-func (spyRepo ProductRepositoryInMemorySpy) Insert(in productrepo.ProductRepositoryInput) (productrepo.ProductRepositoryData, error) {
-	return spyRepo.ExpectedData, spyRepo.ExpectedError
-}
 
 func TestProductCreate_Create(t *testing.T) {
 	t.Run("Should create a product with success", productCreateSuccess)
@@ -31,7 +24,7 @@ func productCreateSuccess(t *testing.T) {
 	productRepoInMemory := repository.NewProductRepositoryInMemory()
 	productCreate := usecase.NewProductCreate(productRepoInMemory)
 	reference := uuid.FromStringOrNil("6ba7b810-9dad-11d1-80b4-00c04fd430c8")
-	productOutDTO, e := productCreate.Execute(usecase.ProductInputDTO{
+	productOutDTO, e := productCreate.Execute(context.TODO(), usecase.ProductInputDTO{
 		Title: "exacqVision® VMS",
 		Description: `The exacqVision® VMS (Video Management System) software
 		installs on commercial off-the-shelf (COTS) servers running
@@ -50,7 +43,7 @@ func productCreateInvalid(t *testing.T) {
 	productRepoInMemory := repository.NewProductRepositoryInMemory()
 	productCreate := usecase.NewProductCreate(productRepoInMemory)
 	reference := uuid.FromStringOrNil("6ba7b810-9dad-11d1-80b4-00c04fd430c8")
-	productOutDTO, e := productCreate.Execute(usecase.ProductInputDTO{
+	productOutDTO, e := productCreate.Execute(context.TODO(), usecase.ProductInputDTO{
 		Title: "exacqVision® VMS",
 		Description: `The exacqVision® VMS (Video Management System) software
 		installs on commercial off-the-shelf (COTS) servers running
@@ -67,10 +60,10 @@ func productCreateInvalid(t *testing.T) {
 
 func productRepositoryTimeout(t *testing.T) {
 	timeoutErr := errors.New("timeout")
-	productRepoInMemory := ProductRepositoryInMemorySpy{ExpectedError: timeoutErr}
+	productRepoInMemory := repository.ProductRepositoryInMemorySpy{ExpectedError: timeoutErr}
 	productCreate := usecase.NewProductCreate(productRepoInMemory)
 	reference := uuid.FromStringOrNil("6ba7b810-9dad-11d1-80b4-00c04fd430c8")
-	productOutDTO, e := productCreate.Execute(usecase.ProductInputDTO{
+	productOutDTO, e := productCreate.Execute(context.TODO(), usecase.ProductInputDTO{
 		Title: "exacqVision® VMS",
 		Description: `The exacqVision® VMS (Video Management System) software
 		installs on commercial off-the-shelf (COTS) servers running

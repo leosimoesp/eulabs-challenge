@@ -1,5 +1,7 @@
 package repository
 
+import "context"
+
 type ProductRepositoryData struct {
 	Reference string
 	CreatedAt string
@@ -15,5 +17,5 @@ type ProductRepositoryInput struct {
 }
 
 type ProductRepository interface {
-	Insert(in ProductRepositoryInput) (ProductRepositoryData, error)
+	Insert(ctx context.Context, in ProductRepositoryInput) (ProductRepositoryData, error)
 }
