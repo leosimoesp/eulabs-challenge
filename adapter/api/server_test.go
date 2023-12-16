@@ -177,3 +177,55 @@ func getProductNotFoundErr(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, http.StatusNotFound, rec.Code)
 }
+
+func TestWebServer_handleProductDelete(t *testing.T) {
+	t.Run("Should handle delete product request with success", deleteProductSuccess)
+	t.Run("Should results error if product code does not exists", deleteProductNotFoundErr)
+}
+
+func deleteProductSuccess(t *testing.T) {
+	productInMemoryRepo := repository.NewProductRepositoryInMemory()
+	ws := NewWebServer("8080", productInMemoryRepo)
+
+	e := echo.New()
+	rec := httptest.NewRecorder()
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/", nil)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	echoCtx := e.NewContext(req, rec)
+	echoCtx.SetPath("products/:code")
+	echoCtx.SetParamNames("code")
+	echoCtx.SetParamValues("XSZ-000741")
+
+	grApi := e.Group("/api/v1")
+	grApi.DELETE("/products", ws.handleProductDelete)
+
+	err := ws.handleProductDelete(echoCtx)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, rec.Code)
+}
+
+func deleteProductNotFoundErr(t *testing.T) {
+	productInMemoryRepo := repository.ProductRepositoryInMemorySpy{
+		ExpectedError: entity.ProductNotFoundErr,
+	}
+	ws := NewWebServer("8080", productInMemoryRepo)
+
+	e := echo.New()
+	rec := httptest.NewRecorder()
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/", nil)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	echoCtx := e.NewContext(req, rec)
+	echoCtx.SetPath("products/:code")
+	echoCtx.SetParamNames("code")
+	echoCtx.SetParamValues("XSZ-000741")
+
+	grApi := e.Group("/api/v1")
+	grApi.DELETE("/products", ws.handleProductDelete)
+	e.ServeHTTP(rec, req)
+
+	err := ws.handleProductDelete(echoCtx)
+	assert.NotNil(t, err)
+	assert.Equal(t, http.StatusNotFound, rec.Code)
+}
