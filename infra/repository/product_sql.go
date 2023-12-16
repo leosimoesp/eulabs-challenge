@@ -52,3 +52,39 @@ func (r ProductRepositorySQL) Insert(
 		CreatedAt: datetimeFmt,
 	}, nil
 }
+
+func (r ProductRepositorySQL) GetByCode(ctx context.Context,
+	code string) (repository.ProductRepositoryData, error) {
+
+	query := `SELECT p.id, p.title, p.description, p.price_in_cents,
+	p.reference, 
+	CAST(p.created_at AS CHAR) created_at,
+	CAST(p.updated_at AS CHAR) updated_at 
+	FROM products p WHERE LOWER(p.code) = ?`
+
+	codeWithoutSpace := strings.ReplaceAll(code, " ", "")
+	codeLowerCase := strings.ToLower(codeWithoutSpace)
+
+	var id, price int64
+	var title, description, reference, createdAt, updatedAt string
+
+	if e := r.db.QueryRowContext(ctx, query, codeLowerCase).Scan(&id, &title,
+		&description, &price, &reference, &createdAt, &updatedAt); e != nil {
+		if e == sql.ErrNoRows {
+			return repository.ProductRepositoryData{}, entity.ProductNotFoundErr
+		}
+		log.Default().Printf("impossible to retrieve product: %s", e)
+		return repository.ProductRepositoryData{}, e
+	}
+
+	return repository.ProductRepositoryData{
+		Title:        title,
+		Description:  description,
+		Code:         codeWithoutSpace,
+		Reference:    reference,
+		PriceInCents: price,
+		CreatedAt:    createdAt,
+		UpdatedAt:    updatedAt,
+		ID:           id,
+	}, nil
+}

@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestProductCreate_Create(t *testing.T) {
+func TestProductCreate_Execute(t *testing.T) {
 	t.Run("Should create a product with success", productCreateSuccess)
 	t.Run("Should result error if product is invalid", productCreateInvalid)
 	t.Run("Should result error if repository timeout", productRepositoryTimeout)

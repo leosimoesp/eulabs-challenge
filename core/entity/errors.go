@@ -9,4 +9,5 @@ var (
 	RequiredDescriptionErr   = fmt.Errorf("description is required")
 	InvalidPriceErr          = fmt.Errorf("price is invalid")
 	DuplicatedProductCodeErr = fmt.Errorf("a product with this code already exists")
+	ProductNotFoundErr       = fmt.Errorf("product doesn't exists")
 )

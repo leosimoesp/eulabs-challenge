@@ -22,6 +22,7 @@ func (ws WebServer) Run() {
 	e := echo.New()
 	productGroup := e.Group("/api")
 	productGroup.POST("/v1/products", ws.handleProductCreate)
+	productGroup.GET("/v1/products/:code", ws.handleProductGet)
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", ws.port)))
 }
 
@@ -39,4 +40,17 @@ func (ws WebServer) handleProductCreate(c echo.Context) error {
 		return echo.NewHTTPError(code, e.ResultErr.Error())
 	}
 	return c.JSON(http.StatusCreated, outputDTO)
+}
+
+func (ws WebServer) handleProductGet(c echo.Context) error {
+	code := c.Param("code")
+	productGet := usecase.NewProductGet(ws.productRepo)
+	ctx := c.Request().Context()
+	outputDTO, err := productGet.Execute(ctx, code)
+	if err != nil {
+		code := Mapping(err).Code
+		e := Mapping(err)
+		return echo.NewHTTPError(code, e.ResultErr.Error())
+	}
+	return c.JSON(http.StatusOK, outputDTO)
 }

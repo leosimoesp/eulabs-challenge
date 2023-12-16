@@ -3,9 +3,14 @@ package repository
 import "context"
 
 type ProductRepositoryData struct {
-	Reference string
-	CreatedAt string
-	ID        int64
+	Title        string
+	Description  string
+	Code         string
+	Reference    string
+	CreatedAt    string
+	UpdatedAt    string
+	PriceInCents int64
+	ID           int64
 }
 
 type ProductRepositoryInput struct {
@@ -18,4 +23,5 @@ type ProductRepositoryInput struct {
 
 type ProductRepository interface {
 	Insert(ctx context.Context, in ProductRepositoryInput) (ProductRepositoryData, error)
+	GetByCode(ctx context.Context, code string) (ProductRepositoryData, error)
 }
