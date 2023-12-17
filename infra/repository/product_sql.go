@@ -38,12 +38,12 @@ func (r ProductRepositorySQL) Insert(
 		if strings.Contains(err.Error(), "Duplicate entry") {
 			return repository.ProductRepositoryData{}, entity.DuplicatedProductCodeErr
 		}
-		slog.Error("impossible insert product: %v", err)
+		slog.Error("impossible insert product", slog.Any("msg", err))
 		return repository.ProductRepositoryData{}, err
 	}
 	id, err := insertResult.LastInsertId()
 	if err != nil {
-		slog.Error("impossible to retrieve last inserted product id: %v", err)
+		slog.Error("impossible to retrieve last inserted product id", slog.Any("msg", err))
 	}
 
 	return repository.ProductRepositoryData{
@@ -73,7 +73,7 @@ func (r ProductRepositorySQL) GetByCode(ctx context.Context,
 		if e == sql.ErrNoRows {
 			return repository.ProductRepositoryData{}, entity.ProductNotFoundErr
 		}
-		slog.Error("impossible to retrieve product: %v", e)
+		slog.Error("impossible to retrieve product", slog.Any("msg", e))
 		return repository.ProductRepositoryData{}, e
 	}
 
@@ -96,16 +96,21 @@ func (r ProductRepositorySQL) DeleteByCode(ctx context.Context, code string) (bo
 	query := `DELETE FROM products WHERE LOWER(code) = ?`
 	result, e := r.db.ExecContext(ctx, query, codeLowerCase)
 
+	if e != nil {
+		slog.Error("impossible to delete product", slog.Any("msg", e))
+		return false, e
+	}
+
 	if affectedRows, err := result.RowsAffected(); err == nil {
 		if affectedRows > 0 {
 			return affectedRows > 0, nil
 		}
 		return false, entity.ProductNotFoundErr
 	} else {
-		slog.Error("impossible to delete product: %v", e)
+		slog.Error("impossible to delete product", slog.Any("msg", err))
 	}
 
-	return e == nil, e
+	return true, nil
 }
 
 func (r ProductRepositorySQL) Update(ctx context.Context,
@@ -125,7 +130,7 @@ func (r ProductRepositorySQL) Update(ctx context.Context,
 			return nil
 		}
 	} else {
-		slog.Error("impossible update product: %v", e)
+		slog.Error("impossible to update product", slog.Any("msg", err))
 	}
 	return e
 }

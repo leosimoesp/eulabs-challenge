@@ -39,7 +39,7 @@ func NewProductCreate(productRepo repository.ProductRepository) *ProductCreate {
 
 func (p *ProductCreate) Execute(ctx context.Context, input ProductInputDTO) (ProductOutputDTO, error) {
 	if e := validate(input); e != nil {
-		slog.Error("impossible to create product: %v", e)
+		slog.Error("impossible to create product", slog.Any("msg", e))
 		return ProductOutputDTO{}, e
 	}
 
@@ -55,7 +55,7 @@ func (p *ProductCreate) Execute(ctx context.Context, input ProductInputDTO) (Pro
 	})
 
 	if err != nil {
-		slog.Error("impossible to create product: %v", err)
+		slog.Error("impossible to create product", slog.Any("msg", err))
 		return ProductOutputDTO{}, err
 	}
 

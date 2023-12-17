@@ -36,7 +36,7 @@ func (p *ProductGet) Execute(ctx context.Context, code string) (ProductGetOutput
 	productData, err := p.repository.GetByCode(ctxWithTimeout, code)
 
 	if err != nil {
-		slog.Error("impossible to get product: %v", err)
+		slog.Error("impossible to get product", slog.Any("msg", err))
 		return ProductGetOutputDTO{}, err
 	}
 	return ProductGetOutputDTO{

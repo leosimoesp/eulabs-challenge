@@ -28,7 +28,7 @@ func (p *ProductUpdate) Execute(ctx context.Context, input ProductInputDTO) erro
 	productData, err := p.repository.GetByCode(ctx, input.Code)
 
 	if err != nil {
-		slog.Error("impossible to update product: %v", err)
+		slog.Error("impossible to update product", slog.Any("msg", err))
 		return err
 	}
 
