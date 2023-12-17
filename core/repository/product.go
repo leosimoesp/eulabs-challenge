@@ -25,4 +25,5 @@ type ProductRepository interface {
 	Insert(ctx context.Context, in ProductRepositoryInput) (ProductRepositoryData, error)
 	GetByCode(ctx context.Context, code string) (ProductRepositoryData, error)
 	DeleteByCode(ctx context.Context, code string) (bool, error)
+	Update(ctx context.Context, in ProductRepositoryInput) error
 }

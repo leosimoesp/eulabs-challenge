@@ -18,7 +18,7 @@ func NewProductDelete(productRepo repository.ProductRepository) *ProductDelete {
 }
 
 func (p *ProductDelete) Execute(ctx context.Context, code string) (bool, error) {
-	ctxWithTimeout, cancel := context.WithTimeout(ctx, time.Duration(ProductCreateTimeout))
+	ctxWithTimeout, cancel := context.WithTimeout(ctx, time.Duration(ProductDefaultTimeout))
 	defer cancel()
 	isDeleted, err := p.repository.DeleteByCode(ctxWithTimeout, code)
 

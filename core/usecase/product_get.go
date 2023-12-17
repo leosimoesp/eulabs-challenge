@@ -30,7 +30,7 @@ func NewProductGet(productRepo repository.ProductRepository) *ProductGet {
 
 func (p *ProductGet) Execute(ctx context.Context, code string) (ProductGetOutputDTO, error) {
 
-	ctxWithTimeout, cancel := context.WithTimeout(ctx, time.Duration(ProductCreateTimeout))
+	ctxWithTimeout, cancel := context.WithTimeout(ctx, time.Duration(ProductDefaultTimeout))
 	defer cancel()
 	productData, err := p.repository.GetByCode(ctxWithTimeout, code)
 
