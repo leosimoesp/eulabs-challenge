@@ -24,10 +24,16 @@ func (p *ProductUpdate) Execute(ctx context.Context, input ProductInputDTO) erro
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, time.Duration(ProductDefaultTimeout))
 	defer cancel()
 
+	productData, err := p.repository.GetByCode(ctx, input.Code)
+
+	if err != nil {
+		return err
+	}
+
 	return p.repository.Update(ctxWithTimeout, repository.ProductRepositoryInput{
 		Title:        input.Title,
 		Description:  input.Description,
-		Code:         input.Code,
+		Code:         productData.Code,
 		Reference:    input.Reference,
 		PriceInCents: input.PriceInCents,
 	})

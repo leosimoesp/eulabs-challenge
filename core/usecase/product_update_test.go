@@ -15,6 +15,7 @@ func TestProductUpdate_Execute(t *testing.T) {
 	t.Run("Should update a product with success", productUpdateSuccess)
 	t.Run("Should results an error if product code is empty", productUpdateCodeEmptyErr)
 	t.Run("Should results an error if product is invalid", productUpdateInvalidErr)
+	t.Run("Should results an error if product does not exist", productUpdateNotFoundErr)
 
 }
 
@@ -71,4 +72,26 @@ func productUpdateInvalidErr(t *testing.T) {
 	})
 	assert.NotNil(t, e)
 	assert.EqualError(t, e, entity.RequiredDescriptionErr.Error())
+}
+
+func productUpdateNotFoundErr(t *testing.T) {
+	productRepoInMemory := repository.ProductRepositoryInMemorySpy{
+		ExpectedError: entity.ProductNotFoundErr,
+	}
+	productUpdate := usecase.NewProductUpdate(productRepoInMemory)
+	reference := uuid.FromStringOrNil("6ba7b810-9dad-11d1-80b4-00c04fd430c8")
+
+	e := productUpdate.Execute(context.TODO(), usecase.ProductInputDTO{
+		Title: "exacqVision® VMS",
+		Description: `The exacqVision® VMS (Video Management System) software
+	installs on commercial off-the-shelf (COTS) servers running
+	Windows or Linux operating systems to create an advanced
+	security solution, providing recording of the latest, state-of-
+	the-art IP video surveillance cameras.`,
+		Code:         "0001-DEF-UDSE-0000",
+		PriceInCents: int64(10000),
+		Reference:    reference.String(),
+	})
+	assert.NotNil(t, e)
+	assert.EqualError(t, e, entity.ProductNotFoundErr.Error())
 }
