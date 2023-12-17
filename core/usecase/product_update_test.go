@@ -16,7 +16,6 @@ func TestProductUpdate_Execute(t *testing.T) {
 	t.Run("Should results an error if product code is empty", productUpdateCodeEmptyErr)
 	t.Run("Should results an error if product is invalid", productUpdateInvalidErr)
 	t.Run("Should results an error if product does not exist", productUpdateNotFoundErr)
-
 }
 
 func productUpdateSuccess(t *testing.T) {
