@@ -97,6 +97,12 @@ git clone git@github.com:leosimoesp/eulabs-challenge.git
 Na raiz do projeto crie um arquivo `.env` com as variáveis de ambiente necessárias
 conforme o arquivo de exemplo `.env.example`
 
+Inicializando o banco de dados com o `docker compose`, execute: 
+
+```
+make start
+```
+
 Execute o seguinte comando para gerar o binário da aplicação:
 
 ```

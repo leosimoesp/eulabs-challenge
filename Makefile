@@ -4,6 +4,9 @@ run-unit-tests:
 stop: 
 	docker compose down
 
+start:
+	docker compose up -d
+
 build:
 	rm -rf bin/*
 	go mod tidy
