@@ -121,7 +121,6 @@ func (r ProductRepositorySQL) Update(ctx context.Context,
 		if affectedRows > 0 {
 			return nil
 		}
-		return entity.ProductNotFoundErr
 	}
 	return e
 }
