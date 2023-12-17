@@ -24,6 +24,7 @@ func (ws WebServer) Run() {
 	productGroup.POST("/v1/products", ws.handleProductCreate)
 	productGroup.GET("/v1/products/:code", ws.handleProductGet)
 	productGroup.DELETE("/v1/products/:code", ws.handleProductDelete)
+	productGroup.PATCH("/v1/products", ws.handleProductUpdate)
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", ws.port)))
 }
 
@@ -62,6 +63,22 @@ func (ws WebServer) handleProductDelete(c echo.Context) error {
 	ctx := c.Request().Context()
 	_, err := productDelete.Execute(ctx, code)
 	if err != nil {
+		code := Mapping(err).Code
+		e := Mapping(err)
+		return echo.NewHTTPError(code, e.ResultErr.Error())
+	}
+	return c.NoContent(http.StatusOK)
+}
+
+func (ws WebServer) handleProductUpdate(c echo.Context) error {
+	productUpdate := usecase.NewProductUpdate(ws.productRepo)
+
+	var inputDTO usecase.ProductInputDTO
+	if err := c.Bind(&inputDTO); err != nil {
+		return err
+	}
+	ctx := c.Request().Context()
+	if err := productUpdate.Execute(ctx, inputDTO); err != nil {
 		code := Mapping(err).Code
 		e := Mapping(err)
 		return echo.NewHTTPError(code, e.ResultErr.Error())
