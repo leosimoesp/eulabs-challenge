@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"log/slog"
 	"time"
 
 	"github.com/lbsti/eulabs-challenge/core/repository"
@@ -23,6 +24,7 @@ func (p *ProductDelete) Execute(ctx context.Context, code string) (bool, error) 
 	isDeleted, err := p.repository.DeleteByCode(ctxWithTimeout, code)
 
 	if err != nil {
+		slog.Error("impossible to delete product: %v", err)
 		return false, err
 	}
 	return isDeleted, nil

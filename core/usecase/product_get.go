@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"log/slog"
 	"time"
 
 	"github.com/lbsti/eulabs-challenge/core/repository"
@@ -35,6 +36,7 @@ func (p *ProductGet) Execute(ctx context.Context, code string) (ProductGetOutput
 	productData, err := p.repository.GetByCode(ctxWithTimeout, code)
 
 	if err != nil {
+		slog.Error("impossible to get product: %v", err)
 		return ProductGetOutputDTO{}, err
 	}
 	return ProductGetOutputDTO{

@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"log/slog"
 	"time"
 
 	"github.com/lbsti/eulabs-challenge/core/entity"
@@ -38,6 +39,7 @@ func NewProductCreate(productRepo repository.ProductRepository) *ProductCreate {
 
 func (p *ProductCreate) Execute(ctx context.Context, input ProductInputDTO) (ProductOutputDTO, error) {
 	if e := validate(input); e != nil {
+		slog.Error("impossible to create product: %v", e)
 		return ProductOutputDTO{}, e
 	}
 
@@ -53,6 +55,7 @@ func (p *ProductCreate) Execute(ctx context.Context, input ProductInputDTO) (Pro
 	})
 
 	if err != nil {
+		slog.Error("impossible to create product: %v", err)
 		return ProductOutputDTO{}, err
 	}
 

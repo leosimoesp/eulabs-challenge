@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	"log/slog"
 
 	"github.com/lbsti/eulabs-challenge/adapter/api"
 	migrate "github.com/lbsti/eulabs-challenge/db"
@@ -26,7 +26,7 @@ func main() {
 
 	e := migrate.RunMigrate("up", dbPool.GetDSN(), "db/migrations", []string{}...)
 	if e != nil {
-		log.Default().Printf("failure when execute migration %v", e)
+		slog.Error("failure when execute migration %v", e)
 	}
 	productRepo := repository.NewProductRepositorySQL(db)
 	webServer := api.NewWebServer(cfg.AppServerPort, productRepo)
