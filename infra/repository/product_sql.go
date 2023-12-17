@@ -104,3 +104,24 @@ func (r ProductRepositorySQL) DeleteByCode(ctx context.Context, code string) (bo
 	}
 	return e == nil, e
 }
+
+func (r ProductRepositorySQL) Update(ctx context.Context,
+	in repository.ProductRepositoryInput) error {
+	codeWithoutSpace := strings.ReplaceAll(in.Code, " ", "")
+	codeLowerCase := strings.ToLower(codeWithoutSpace)
+
+	query := `UPDATE products SET title = ?, description = ?, reference = ?,
+	 price_in_cents = ? 
+	 WHERE LOWER(code) = ?`
+
+	result, e := r.db.ExecContext(ctx, query, in.Title, in.Description,
+		in.Reference, in.PriceInCents, codeLowerCase)
+
+	if affectedRows, err := result.RowsAffected(); err == nil {
+		if affectedRows > 0 {
+			return nil
+		}
+		return entity.ProductNotFoundErr
+	}
+	return e
+}

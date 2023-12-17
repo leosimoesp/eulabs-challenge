@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	ProductCreateTimeout = time.Second * 300
+	ProductDefaultTimeout = time.Second * 30
 )
 
 type ProductCreate struct {
@@ -37,11 +37,11 @@ func NewProductCreate(productRepo repository.ProductRepository) *ProductCreate {
 }
 
 func (p *ProductCreate) Execute(ctx context.Context, input ProductInputDTO) (ProductOutputDTO, error) {
-	if e := p.validate(input); e != nil {
+	if e := validate(input); e != nil {
 		return ProductOutputDTO{}, e
 	}
 
-	ctxWithTimeout, cancel := context.WithTimeout(ctx, time.Duration(ProductCreateTimeout))
+	ctxWithTimeout, cancel := context.WithTimeout(ctx, time.Duration(ProductDefaultTimeout))
 	defer cancel()
 
 	productData, err := p.repository.Insert(ctxWithTimeout, repository.ProductRepositoryInput{
@@ -63,7 +63,7 @@ func (p *ProductCreate) Execute(ctx context.Context, input ProductInputDTO) (Pro
 	}, nil
 }
 
-func (p *ProductCreate) validate(input ProductInputDTO) error {
+func validate(input ProductInputDTO) error {
 	product := entity.NewProduct()
 	product.Title = input.Title
 	product.Description = input.Description
