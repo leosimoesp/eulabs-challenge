@@ -229,3 +229,86 @@ func deleteProductNotFoundErr(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, http.StatusNotFound, rec.Code)
 }
+
+func TestWebServer_handleProductUpdate(t *testing.T) {
+	t.Run("Should handle update product request with success", updateProductSuccess)
+	t.Run("Should results error if update product request send invalid payload", updateProductBindErr)
+	t.Run("Should results error if product code does not exists", updateProductNotFoundErr)
+}
+
+func updateProductSuccess(t *testing.T) {
+	productInMemoryRepo := repository.NewProductRepositoryInMemory()
+	ws := NewWebServer("8080", productInMemoryRepo)
+
+	e := echo.New()
+	var productInput usecase.ProductInputDTO
+	productInput.Code = "XXCC"
+	productInput.Description = "Description"
+	productInput.PriceInCents = int64(2500)
+	productInput.Reference = "XZsdf5tY-AA"
+	productInput.Title = "Toy"
+
+	body, err := json.Marshal(productInput)
+	assert.NoError(t, err)
+	rec := httptest.NewRecorder()
+
+	req := httptest.NewRequest(http.MethodPatch, "/api/v1/products", bytes.NewReader(body))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	echoCtx := e.NewContext(req, rec)
+
+	err2 := ws.handleProductUpdate(echoCtx)
+	assert.Nil(t, err2)
+
+	assert.Equal(t, "", rec.Body.String())
+	assert.Equal(t, http.StatusOK, rec.Code)
+}
+
+func updateProductBindErr(t *testing.T) {
+	productInMemoryRepo := repository.NewProductRepositoryInMemory()
+	ws := NewWebServer("8080", productInMemoryRepo)
+	e := echo.New()
+
+	rec := httptest.NewRecorder()
+
+	req := httptest.NewRequest(http.MethodPatch, "/api/v1/products",
+		bytes.NewReader([]byte(`{`)))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+	grApi := e.Group("/api")
+	grApi.PATCH("/v1/products", ws.handleProductUpdate)
+	e.ServeHTTP(rec, req)
+	assert.Equal(t, "{\"message\":\"unexpected EOF\"}\n", rec.Body.String())
+	assert.Equal(t, http.StatusBadRequest, rec.Code)
+}
+
+func updateProductNotFoundErr(t *testing.T) {
+	productInMemoryRepo := repository.ProductRepositoryInMemorySpy{
+		ExpectedError: entity.ProductNotFoundErr,
+	}
+	ws := NewWebServer("8080", productInMemoryRepo)
+
+	e := echo.New()
+	var productInput usecase.ProductInputDTO
+	productInput.Code = "XXCC"
+	productInput.Description = "Description"
+	productInput.PriceInCents = int64(2500)
+	productInput.Reference = "XZsdf5tY-AA"
+	productInput.Title = "Toy"
+
+	body, err := json.Marshal(productInput)
+	assert.NoError(t, err)
+	rec := httptest.NewRecorder()
+
+	req := httptest.NewRequest(http.MethodPatch, "/api/v1/", bytes.NewReader(body))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	echoCtx := e.NewContext(req, rec)
+	echoCtx.SetPath("products")
+
+	grApi := e.Group("/api/v1")
+	grApi.PATCH("/products", ws.handleProductUpdate)
+	e.ServeHTTP(rec, req)
+
+	err2 := ws.handleProductUpdate(echoCtx)
+	assert.NotNil(t, err2)
+	assert.Equal(t, http.StatusNotFound, rec.Code)
+}
