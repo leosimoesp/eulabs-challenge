@@ -20,7 +20,6 @@ Essa api segue o design do `clean architecture` dividida nas camadas conforme ab
 
 <img src="./docs/images/project-design.png" >
 <br />
-<br />
 
  - Adapter - camada que facilita o desacoplamento entre as camadas de mais baixo nível
  e permite o reuso do core business.
@@ -50,6 +49,9 @@ Essa api segue o design do `clean architecture` dividida nas camadas conforme ab
 
  - DOCS - contém arquivos de exemplo e imagens complementares para auxiliar a
  documentação do projeto.
+
+ - Scripts - contém scripts de inicialização do banco de dados. Basicamente cria
+ um user a ser utilizado pela aplicação
 
 ### Stack
 - Postman
@@ -83,3 +85,39 @@ Para executar essa api localmente você precisa instalar:
 - `Go` versão `1.21.5`
 - `Docker` versão `24.07`
 - `Docker Compose` versão `2.21.0`
+
+### Executando localmente
+
+Na raiz do projeto crie um arquivo `.env` com as variáveis de ambiente necessárias
+conforme o arquivo de exemplo `.env.example`
+
+Execute o seguinte comando para gerar o binário da aplicação:
+
+```
+make build
+```
+
+Execute o comando para executar os testes unitários:
+```
+make run-unit-tests
+```
+
+Execute o comando para executar a api:
+```
+make run-api
+```
+
+Abra o postman e importe a coleção disponibilizada em `docs/examples/postman`
+
+### @TODO
+
+- [ ] Implementar Dockerfile para gerar a imagem da api
+- [ ] Implementar scripts git-actions para CI/CD
+- [ ] Implementar testes de integração
+
+
+### Obrigado
+
+Qualquer dúvida ou sugestão, por favor, entre em contato comigo:
+Leonardo Simões
+leolbsti@gmail.com
