@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"log"
+	"log/slog"
 	"strings"
 	"time"
 
@@ -38,12 +38,12 @@ func (r ProductRepositorySQL) Insert(
 		if strings.Contains(err.Error(), "Duplicate entry") {
 			return repository.ProductRepositoryData{}, entity.DuplicatedProductCodeErr
 		}
-		log.Default().Printf("impossible insert product: %s", err)
+		slog.Error("impossible insert product: %v", err)
 		return repository.ProductRepositoryData{}, err
 	}
 	id, err := insertResult.LastInsertId()
 	if err != nil {
-		log.Default().Printf("impossible to retrieve last inserted product id: %s", err)
+		slog.Error("impossible to retrieve last inserted product id: %v", err)
 	}
 
 	return repository.ProductRepositoryData{
@@ -73,7 +73,7 @@ func (r ProductRepositorySQL) GetByCode(ctx context.Context,
 		if e == sql.ErrNoRows {
 			return repository.ProductRepositoryData{}, entity.ProductNotFoundErr
 		}
-		log.Default().Printf("impossible to retrieve product: %s", e)
+		slog.Error("impossible to retrieve product: %v", e)
 		return repository.ProductRepositoryData{}, e
 	}
 
@@ -101,7 +101,10 @@ func (r ProductRepositorySQL) DeleteByCode(ctx context.Context, code string) (bo
 			return affectedRows > 0, nil
 		}
 		return false, entity.ProductNotFoundErr
+	} else {
+		slog.Error("impossible to delete product: %v", e)
 	}
+
 	return e == nil, e
 }
 
@@ -121,6 +124,8 @@ func (r ProductRepositorySQL) Update(ctx context.Context,
 		if affectedRows > 0 {
 			return nil
 		}
+	} else {
+		slog.Error("impossible update product: %v", e)
 	}
 	return e
 }

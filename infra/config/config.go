@@ -29,7 +29,7 @@ type Config struct {
 func extractCurrentDir() string {
 	currentDir, err := os.Getwd()
 	if err != nil {
-		log.Println(err)
+		log.Fatal(err)
 	}
 	if _, err := os.Stat(currentDir + "/.env"); err != nil {
 		tokens := strings.Split(currentDir, "/")

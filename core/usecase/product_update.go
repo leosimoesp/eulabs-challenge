@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"log/slog"
 	"time"
 
 	"github.com/lbsti/eulabs-challenge/core/repository"
@@ -27,6 +28,7 @@ func (p *ProductUpdate) Execute(ctx context.Context, input ProductInputDTO) erro
 	productData, err := p.repository.GetByCode(ctx, input.Code)
 
 	if err != nil {
+		slog.Error("impossible to update product: %v", err)
 		return err
 	}
 
