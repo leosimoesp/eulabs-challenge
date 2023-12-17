@@ -1,4 +1,4 @@
-Desafio Eulabs Backend
+<div align="center"><h2>Desafio Eulabs Backend</h2></div>
 
 
 ## Criar uma API
@@ -87,6 +87,12 @@ Para executar essa api localmente você precisa instalar:
 - `Docker Compose` versão `2.21.0`
 
 ### Executando localmente
+
+Baixe o projeto do github executando:
+
+```
+git clone git@github.com:leosimoesp/eulabs-challenge.git
+```
 
 Na raiz do projeto crie um arquivo `.env` com as variáveis de ambiente necessárias
 conforme o arquivo de exemplo `.env.example`
