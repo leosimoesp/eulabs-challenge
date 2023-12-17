@@ -125,5 +125,6 @@ Abra o postman e importe a coleção disponibilizada em `docs/examples/postman`
 ### Obrigado
 
 Qualquer dúvida ou sugestão, por favor, entre em contato comigo:
-Leonardo Simões
+<br />
+Leonardo Simões<br />
 leolbsti@gmail.com
