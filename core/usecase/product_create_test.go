@@ -24,7 +24,7 @@ func productCreateSuccess(t *testing.T) {
 	productRepoInMemory := repository.NewProductRepositoryInMemory()
 	productCreate := usecase.NewProductCreate(productRepoInMemory)
 	reference := uuid.FromStringOrNil("6ba7b810-9dad-11d1-80b4-00c04fd430c8")
-	productOutDTO, e := productCreate.Execute(context.TODO(), usecase.ProductInputDTO{
+	productOutDTO, err := productCreate.Execute(context.TODO(), usecase.ProductInputDTO{
 		Title: "exacqVision® VMS",
 		Description: `The exacqVision® VMS (Video Management System) software
 		installs on commercial off-the-shelf (COTS) servers running
@@ -35,7 +35,7 @@ func productCreateSuccess(t *testing.T) {
 		PriceInCents: int64(10000),
 		Reference:    reference.String(),
 	})
-	assert.Nil(t, e)
+	assert.Nil(t, err)
 	assert.GreaterOrEqual(t, productOutDTO.ID, int64(1))
 }
 
@@ -43,7 +43,7 @@ func productCreateInvalid(t *testing.T) {
 	productRepoInMemory := repository.NewProductRepositoryInMemory()
 	productCreate := usecase.NewProductCreate(productRepoInMemory)
 	reference := uuid.FromStringOrNil("6ba7b810-9dad-11d1-80b4-00c04fd430c8")
-	productOutDTO, e := productCreate.Execute(context.TODO(), usecase.ProductInputDTO{
+	productOutDTO, err := productCreate.Execute(context.TODO(), usecase.ProductInputDTO{
 		Title: "exacqVision® VMS",
 		Description: `The exacqVision® VMS (Video Management System) software
 		installs on commercial off-the-shelf (COTS) servers running
@@ -53,8 +53,8 @@ func productCreateInvalid(t *testing.T) {
 		PriceInCents: int64(10000),
 		Reference:    reference.String(),
 	})
-	assert.NotNil(t, e)
-	assert.EqualError(t, e, entity.InvalidCodeErr.Error())
+	assert.NotNil(t, err)
+	assert.EqualError(t, err, entity.InvalidCodeErr.Error())
 	assert.Equal(t, productOutDTO, usecase.ProductOutputDTO{})
 }
 
@@ -63,7 +63,7 @@ func productRepositoryTimeout(t *testing.T) {
 	productRepoInMemory := repository.ProductRepositoryInMemorySpy{ExpectedError: timeoutErr}
 	productCreate := usecase.NewProductCreate(productRepoInMemory)
 	reference := uuid.FromStringOrNil("6ba7b810-9dad-11d1-80b4-00c04fd430c8")
-	productOutDTO, e := productCreate.Execute(context.TODO(), usecase.ProductInputDTO{
+	productOutDTO, err := productCreate.Execute(context.TODO(), usecase.ProductInputDTO{
 		Title: "exacqVision® VMS",
 		Description: `The exacqVision® VMS (Video Management System) software
 		installs on commercial off-the-shelf (COTS) servers running
@@ -74,7 +74,7 @@ func productRepositoryTimeout(t *testing.T) {
 		PriceInCents: int64(10000),
 		Reference:    reference.String(),
 	})
-	assert.NotNil(t, e)
-	assert.EqualError(t, e, timeoutErr.Error())
+	assert.NotNil(t, err)
+	assert.EqualError(t, err, timeoutErr.Error())
 	assert.Equal(t, productOutDTO, usecase.ProductOutputDTO{})
 }

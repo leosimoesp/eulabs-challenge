@@ -18,8 +18,8 @@ func TestProductGet_Execute(t *testing.T) {
 func productGetByCodeSuccess(t *testing.T) {
 	productRepoInMemory := repository.NewProductRepositoryInMemory()
 	productGet := usecase.NewProductGet(productRepoInMemory)
-	productGetOutputDTO, e := productGet.Execute(context.TODO(), "XSZ-000741")
-	assert.Nil(t, e)
+	productGetOutputDTO, err := productGet.Execute(context.TODO(), "XSZ-000741")
+	assert.Nil(t, err)
 	assert.GreaterOrEqual(t, productGetOutputDTO.ID, int64(1))
 }
 
@@ -28,7 +28,7 @@ func productGetByCodeNotFoundErr(t *testing.T) {
 		ExpectedError: entity.ProductNotFoundErr,
 	}
 	productGet := usecase.NewProductGet(productRepoInMemory)
-	productGetOutputDTO, e := productGet.Execute(context.TODO(), "XSZ-000741")
-	assert.NotNil(t, e)
+	productGetOutputDTO, err := productGet.Execute(context.TODO(), "XSZ-000741")
+	assert.NotNil(t, err)
 	assert.Equal(t, productGetOutputDTO.ID, int64(0))
 }

@@ -25,7 +25,7 @@ func createProductSuccess(t *testing.T) {
 	productInMemoryRepo := repository.NewProductRepositoryInMemory()
 	ws := NewWebServer("8080", productInMemoryRepo)
 
-	e := echo.New()
+	echoInstance := echo.New()
 	var productInput usecase.ProductInputDTO
 	productInput.Code = "XXCC"
 	productInput.Description = "Description"
@@ -39,7 +39,7 @@ func createProductSuccess(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPost, "/api/v1/products", bytes.NewReader(body))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-	echoCtx := e.NewContext(req, rec)
+	echoCtx := echoInstance.NewContext(req, rec)
 
 	err2 := ws.handleProductCreate(echoCtx)
 	assert.Nil(t, err2)
@@ -59,7 +59,7 @@ func createProductDuplicatedErr(t *testing.T) {
 	}
 	ws := NewWebServer("8080", productInMemoryRepo)
 
-	e := echo.New()
+	echoInstance := echo.New()
 	var productInput usecase.ProductInputDTO
 	productInput.Code = "XXCC"
 	productInput.Description = "Description"
@@ -73,9 +73,9 @@ func createProductDuplicatedErr(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/api/v1/products", bytes.NewReader(body))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 
-	grApi := e.Group("/api")
+	grApi := echoInstance.Group("/api")
 	grApi.POST("/v1/products", ws.handleProductCreate)
-	e.ServeHTTP(rec, req)
+	echoInstance.ServeHTTP(rec, req)
 	assert.Equal(t, "{\"message\":\"a product with this code already exists\"}\n", rec.Body.String())
 	assert.Equal(t, http.StatusConflict, rec.Code)
 }
@@ -83,15 +83,15 @@ func createProductDuplicatedErr(t *testing.T) {
 func createProductBindErr(t *testing.T) {
 	productInMemoryRepo := repository.NewProductRepositoryInMemory()
 	ws := NewWebServer("8080", productInMemoryRepo)
-	e := echo.New()
+	echoInstance := echo.New()
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodPost, "/api/v1/products", bytes.NewReader([]byte(`{`)))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 
-	grApi := e.Group("/api")
+	grApi := echoInstance.Group("/api")
 	grApi.POST("/v1/products", ws.handleProductCreate)
-	e.ServeHTTP(rec, req)
+	echoInstance.ServeHTTP(rec, req)
 	assert.Equal(t, "{\"message\":\"unexpected EOF\"}\n", rec.Body.String())
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 }
@@ -100,7 +100,7 @@ func createProductEmptyCodeErr(t *testing.T) {
 	productInMemoryRepo := repository.NewProductRepositoryInMemory()
 	ws := NewWebServer("8080", productInMemoryRepo)
 
-	e := echo.New()
+	echoInstance := echo.New()
 	var productInput usecase.ProductInputDTO
 	productInput.Description = "Description"
 	productInput.PriceInCents = int64(2500)
@@ -114,9 +114,9 @@ func createProductEmptyCodeErr(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/api/v1/products", bytes.NewReader(body))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 
-	grApi := e.Group("/api")
+	grApi := echoInstance.Group("/api")
 	grApi.POST("/v1/products", ws.handleProductCreate)
-	e.ServeHTTP(rec, req)
+	echoInstance.ServeHTTP(rec, req)
 	assert.Equal(t, "{\"message\":\"code is invalid\"}\n", rec.Body.String())
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 }
@@ -130,17 +130,17 @@ func getProductSuccess(t *testing.T) {
 	productInMemoryRepo := repository.NewProductRepositoryInMemory()
 	ws := NewWebServer("8080", productInMemoryRepo)
 
-	e := echo.New()
+	echoInstance := echo.New()
 	rec := httptest.NewRecorder()
 
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/", nil)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-	echoCtx := e.NewContext(req, rec)
+	echoCtx := echoInstance.NewContext(req, rec)
 	echoCtx.SetPath("products/:code")
 	echoCtx.SetParamNames("code")
 	echoCtx.SetParamValues("XSZ-000741")
 
-	grApi := e.Group("/api/v1")
+	grApi := echoInstance.Group("/api/v1")
 	grApi.GET("/products", ws.handleProductGet)
 
 	var productGetOutputDTO usecase.ProductGetOutputDTO
@@ -159,19 +159,19 @@ func getProductNotFoundErr(t *testing.T) {
 	}
 	ws := NewWebServer("8080", productInMemoryRepo)
 
-	e := echo.New()
+	echoInstance := echo.New()
 	rec := httptest.NewRecorder()
 
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/", nil)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-	echoCtx := e.NewContext(req, rec)
+	echoCtx := echoInstance.NewContext(req, rec)
 	echoCtx.SetPath("products/:code")
 	echoCtx.SetParamNames("code")
 	echoCtx.SetParamValues("XSZ-000741")
 
-	grApi := e.Group("/api/v1")
+	grApi := echoInstance.Group("/api/v1")
 	grApi.GET("/products", ws.handleProductGet)
-	e.ServeHTTP(rec, req)
+	echoInstance.ServeHTTP(rec, req)
 
 	err := ws.handleProductGet(echoCtx)
 	assert.NotNil(t, err)
@@ -187,17 +187,17 @@ func deleteProductSuccess(t *testing.T) {
 	productInMemoryRepo := repository.NewProductRepositoryInMemory()
 	ws := NewWebServer("8080", productInMemoryRepo)
 
-	e := echo.New()
+	echoInstance := echo.New()
 	rec := httptest.NewRecorder()
 
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/", nil)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-	echoCtx := e.NewContext(req, rec)
+	echoCtx := echoInstance.NewContext(req, rec)
 	echoCtx.SetPath("products/:code")
 	echoCtx.SetParamNames("code")
 	echoCtx.SetParamValues("XSZ-000741")
 
-	grApi := e.Group("/api/v1")
+	grApi := echoInstance.Group("/api/v1")
 	grApi.DELETE("/products", ws.handleProductDelete)
 
 	err := ws.handleProductDelete(echoCtx)
@@ -211,19 +211,19 @@ func deleteProductNotFoundErr(t *testing.T) {
 	}
 	ws := NewWebServer("8080", productInMemoryRepo)
 
-	e := echo.New()
+	echoInstance := echo.New()
 	rec := httptest.NewRecorder()
 
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/", nil)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-	echoCtx := e.NewContext(req, rec)
+	echoCtx := echoInstance.NewContext(req, rec)
 	echoCtx.SetPath("products/:code")
 	echoCtx.SetParamNames("code")
 	echoCtx.SetParamValues("XSZ-000741")
 
-	grApi := e.Group("/api/v1")
+	grApi := echoInstance.Group("/api/v1")
 	grApi.DELETE("/products", ws.handleProductDelete)
-	e.ServeHTTP(rec, req)
+	echoInstance.ServeHTTP(rec, req)
 
 	err := ws.handleProductDelete(echoCtx)
 	assert.NotNil(t, err)
@@ -240,7 +240,7 @@ func updateProductSuccess(t *testing.T) {
 	productInMemoryRepo := repository.NewProductRepositoryInMemory()
 	ws := NewWebServer("8080", productInMemoryRepo)
 
-	e := echo.New()
+	echoInstance := echo.New()
 	var productInput usecase.ProductInputDTO
 	productInput.Code = "XXCC"
 	productInput.Description = "Description"
@@ -254,7 +254,7 @@ func updateProductSuccess(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPatch, "/api/v1/products", bytes.NewReader(body))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-	echoCtx := e.NewContext(req, rec)
+	echoCtx := echoInstance.NewContext(req, rec)
 
 	err2 := ws.handleProductUpdate(echoCtx)
 	assert.Nil(t, err2)
@@ -266,7 +266,7 @@ func updateProductSuccess(t *testing.T) {
 func updateProductBindErr(t *testing.T) {
 	productInMemoryRepo := repository.NewProductRepositoryInMemory()
 	ws := NewWebServer("8080", productInMemoryRepo)
-	e := echo.New()
+	echoInstance := echo.New()
 
 	rec := httptest.NewRecorder()
 
@@ -274,9 +274,9 @@ func updateProductBindErr(t *testing.T) {
 		bytes.NewReader([]byte(`{`)))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 
-	grApi := e.Group("/api")
+	grApi := echoInstance.Group("/api")
 	grApi.PATCH("/v1/products", ws.handleProductUpdate)
-	e.ServeHTTP(rec, req)
+	echoInstance.ServeHTTP(rec, req)
 	assert.Equal(t, "{\"message\":\"unexpected EOF\"}\n", rec.Body.String())
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 }
@@ -287,7 +287,7 @@ func updateProductNotFoundErr(t *testing.T) {
 	}
 	ws := NewWebServer("8080", productInMemoryRepo)
 
-	e := echo.New()
+	echoInstance := echo.New()
 	var productInput usecase.ProductInputDTO
 	productInput.Code = "XXCC"
 	productInput.Description = "Description"
@@ -301,12 +301,12 @@ func updateProductNotFoundErr(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPatch, "/api/v1/", bytes.NewReader(body))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-	echoCtx := e.NewContext(req, rec)
+	echoCtx := echoInstance.NewContext(req, rec)
 	echoCtx.SetPath("products")
 
-	grApi := e.Group("/api/v1")
+	grApi := echoInstance.Group("/api/v1")
 	grApi.PATCH("/products", ws.handleProductUpdate)
-	e.ServeHTTP(rec, req)
+	echoInstance.ServeHTTP(rec, req)
 
 	err2 := ws.handleProductUpdate(echoCtx)
 	assert.NotNil(t, err2)

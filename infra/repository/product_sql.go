@@ -68,13 +68,13 @@ func (r ProductRepositorySQL) GetByCode(ctx context.Context,
 	var id, price int64
 	var title, description, reference, createdAt, updatedAt string
 
-	if e := r.db.QueryRowContext(ctx, query, codeLowerCase).Scan(&id, &title,
-		&description, &price, &reference, &createdAt, &updatedAt); e != nil {
-		if e == sql.ErrNoRows {
+	if err := r.db.QueryRowContext(ctx, query, codeLowerCase).Scan(&id, &title,
+		&description, &price, &reference, &createdAt, &updatedAt); err != nil {
+		if err == sql.ErrNoRows {
 			return repository.ProductRepositoryData{}, entity.ProductNotFoundErr
 		}
-		slog.Error("impossible to retrieve product", slog.Any("msg", e))
-		return repository.ProductRepositoryData{}, e
+		slog.Error("impossible to retrieve product", slog.Any("msg", err))
+		return repository.ProductRepositoryData{}, err
 	}
 
 	return repository.ProductRepositoryData{
@@ -94,11 +94,11 @@ func (r ProductRepositorySQL) DeleteByCode(ctx context.Context, code string) (bo
 	codeLowerCase := strings.ToLower(codeWithoutSpace)
 
 	query := `DELETE FROM products WHERE LOWER(code) = ?`
-	result, e := r.db.ExecContext(ctx, query, codeLowerCase)
+	result, err := r.db.ExecContext(ctx, query, codeLowerCase)
 
-	if e != nil {
-		slog.Error("impossible to delete product", slog.Any("msg", e))
-		return false, e
+	if err != nil {
+		slog.Error("impossible to delete product", slog.Any("msg", err))
+		return false, err
 	}
 
 	if affectedRows, err := result.RowsAffected(); err == nil {
@@ -122,7 +122,7 @@ func (r ProductRepositorySQL) Update(ctx context.Context,
 	 price_in_cents = ? 
 	 WHERE LOWER(code) = ?`
 
-	result, e := r.db.ExecContext(ctx, query, in.Title, in.Description,
+	result, err := r.db.ExecContext(ctx, query, in.Title, in.Description,
 		in.Reference, in.PriceInCents, codeLowerCase)
 
 	if affectedRows, err := result.RowsAffected(); err == nil {
@@ -132,5 +132,5 @@ func (r ProductRepositorySQL) Update(ctx context.Context,
 	} else {
 		slog.Error("impossible to update product", slog.Any("msg", err))
 	}
-	return e
+	return err
 }

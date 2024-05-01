@@ -38,9 +38,9 @@ func NewProductCreate(productRepo repository.ProductRepository) *ProductCreate {
 }
 
 func (p *ProductCreate) Execute(ctx context.Context, input ProductInputDTO) (ProductOutputDTO, error) {
-	if e := validate(input); e != nil {
-		slog.Error("impossible to create product", slog.Any("msg", e))
-		return ProductOutputDTO{}, e
+	if err := validate(input); err != nil {
+		slog.Error("impossible to create product", slog.Any("msg", err))
+		return ProductOutputDTO{}, err
 	}
 
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, time.Duration(ProductDefaultTimeout))
@@ -74,8 +74,8 @@ func validate(input ProductInputDTO) error {
 	product.Reference = input.Reference
 	product.PriceInCents = input.PriceInCents
 
-	if e := product.IsValid(); e != nil {
-		return e
+	if err := product.IsValid(); err != nil {
+		return err
 	}
 	return nil
 }
