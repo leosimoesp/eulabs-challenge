@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/lbsti/eulabs-challenge/core/repository"
-	"github.com/lbsti/eulabs-challenge/core/usecase"
+	"github.com/lbsti/eulabs-challenge/internal/core/repository"
+	"github.com/lbsti/eulabs-challenge/internal/core/usecase"
 )
 
 type WebServer struct {

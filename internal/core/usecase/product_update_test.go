@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	"github.com/gofrs/uuid/v5"
-	"github.com/lbsti/eulabs-challenge/core/entity"
-	"github.com/lbsti/eulabs-challenge/core/usecase"
-	"github.com/lbsti/eulabs-challenge/infra/repository"
+	"github.com/lbsti/eulabs-challenge/internal/core/entity"
+	"github.com/lbsti/eulabs-challenge/internal/core/usecase"
+	"github.com/lbsti/eulabs-challenge/internal/infra/repository"
 	"github.com/stretchr/testify/assert"
 )
 
