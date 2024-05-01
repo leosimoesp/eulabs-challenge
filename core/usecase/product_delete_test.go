@@ -19,8 +19,8 @@ func productDeleteSuccess(t *testing.T) {
 	productRepoInMemory := repository.NewProductRepositoryInMemory()
 	productDelete := usecase.NewProductDelete(productRepoInMemory)
 
-	isDeleted, e := productDelete.Execute(context.TODO(), "XSZ-000741")
-	assert.Nil(t, e)
+	isDeleted, err := productDelete.Execute(context.TODO(), "XSZ-000741")
+	assert.Nil(t, err)
 	assert.True(t, isDeleted)
 }
 
@@ -30,7 +30,7 @@ func productDeleteNotFoundErr(t *testing.T) {
 	}
 	productDelete := usecase.NewProductDelete(productRepoInMemory)
 
-	isDeleted, e := productDelete.Execute(context.TODO(), "XSZ-000741")
-	assert.NotNil(t, e)
+	isDeleted, err := productDelete.Execute(context.TODO(), "XSZ-000741")
+	assert.NotNil(t, err)
 	assert.False(t, isDeleted)
 }

@@ -24,9 +24,9 @@ func main() {
 	db := dbPool.GetDB()
 	defer db.Close()
 
-	e := migrate.RunMigrate("up", dbPool.GetDSN(), "db/migrations", []string{}...)
-	if e != nil {
-		log.Default().Printf("failure when execute migration %v", e)
+	err := migrate.RunMigrate("up", dbPool.GetDSN(), "db/migrations", []string{}...)
+	if err != nil {
+		log.Default().Printf("failure when execute migration %v", err)
 	}
 	productRepo := repository.NewProductRepositorySQL(db)
 	webServer := api.NewWebServer(cfg.AppServerPort, productRepo)

@@ -49,14 +49,14 @@ func Load() Config {
 	currentDir := extractCurrentDir()
 	err := godotenv.Load(currentDir + "/.env")
 	if err != nil {
-		log.Fatalf("unable to load .env file: %e", err)
+		log.Fatalf("unable to load .env file: %v", err)
 	}
 
 	log.Default().SetPrefix("\r")
 
 	cfg := Config{}
 	if err := env.Parse(&cfg); err != nil {
-		log.Fatalf("unable to parse .env file: %e", err)
+		log.Fatalf("unable to parse .env file: %v", err)
 	}
 	return cfg
 }

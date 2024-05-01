@@ -19,8 +19,8 @@ func NewProductUpdate(productRepo repository.ProductRepository) *ProductUpdate {
 }
 
 func (p *ProductUpdate) Execute(ctx context.Context, input ProductInputDTO) error {
-	if e := validate(input); e != nil {
-		return e
+	if err := validate(input); err != nil {
+		return err
 	}
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, time.Duration(ProductDefaultTimeout))
 	defer cancel()
