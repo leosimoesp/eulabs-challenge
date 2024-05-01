@@ -34,9 +34,9 @@ func extractCurrentDir() string {
 	if _, err := os.Stat(currentDir + "/.env"); err != nil {
 		tokens := strings.Split(currentDir, "/")
 		var buf bytes.Buffer
-		for i := 0; i < len(tokens)-1; i++ {
-			buf.WriteString(tokens[i])
-			if i != len(tokens)-2 {
+		for index := 0; index < len(tokens)-1; index++ {
+			buf.WriteString(tokens[index])
+			if index != len(tokens)-2 {
 				buf.WriteString("/")
 			}
 		}
