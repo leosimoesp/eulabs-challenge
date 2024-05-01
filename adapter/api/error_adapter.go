@@ -3,7 +3,7 @@ package api
 import (
 	"net/http"
 
-	"github.com/lbsti/eulabs-challenge/core/entity"
+	"github.com/lbsti/eulabs-challenge/internal/core/entity"
 )
 
 type MappedError struct {

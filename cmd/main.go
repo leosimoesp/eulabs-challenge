@@ -5,9 +5,9 @@ import (
 
 	"github.com/lbsti/eulabs-challenge/adapter/api"
 	migrate "github.com/lbsti/eulabs-challenge/db"
-	"github.com/lbsti/eulabs-challenge/infra/config"
-	"github.com/lbsti/eulabs-challenge/infra/database"
-	"github.com/lbsti/eulabs-challenge/infra/repository"
+	"github.com/lbsti/eulabs-challenge/internal/infra/config"
+	"github.com/lbsti/eulabs-challenge/internal/infra/database"
+	"github.com/lbsti/eulabs-challenge/internal/infra/repository"
 )
 
 func main() {

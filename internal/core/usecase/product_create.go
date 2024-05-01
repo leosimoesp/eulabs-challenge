@@ -5,8 +5,8 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/lbsti/eulabs-challenge/core/entity"
-	"github.com/lbsti/eulabs-challenge/core/repository"
+	"github.com/lbsti/eulabs-challenge/internal/core/entity"
+	"github.com/lbsti/eulabs-challenge/internal/core/repository"
 )
 
 const (
